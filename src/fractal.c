@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 
 typedef struct {
     float x;
@@ -56,13 +57,25 @@ void v3(Point *p, float aff[6]) {
 }
 
 void v4(Point *p, float aff[6]) {
-    float r = 1 / (p->x*p->x + p->y*p->y);
+    float r = 1 / sqrt(p->x*p->x + p->y*p->y);
     p->x = r*(p->x-p->y)*(p->x+p->y);
     p->y = 2*p->x*p->y;
 }
 
+void v5(Point *p, float aff[6]) {
+    p->x = atan(p->x / p->y) / M_PI;
+    p->y = sqrt(p->x*p->x + p->y*p->y) - 1;
+}
+
+void v6(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = r * sin(theta + r);
+    p->y = r * cos(theta - r);
+}
+
 void v16(Point *p, float aff[6]) {
-    float r = 2 / (p->x*p->x + p->y*p->y + 1);
+    float r = 2 / (sqrt(p->x*p->x + p->y*p->y) + 1);
     p->x = r*p->y;
     p->y = r*p->x;
 }
@@ -72,17 +85,51 @@ void v17(Point *p, float aff[6]) {
     p->y = p->y + aff[5]*sin(tan(3*p->x));
 }
 
-TransformFunc funcs[] = {v1, v2, v3, v16, v17, v4};
-int nFuncs = sizeof(funcs) / sizeof(TransformFunc);
+int main(int argc, char **argv) {
+    int w = 1000, h = 1000;
 
-int main() {
+    int c;
+    while ((c = getopt(argc, argv, "w:h:")) != -1) {
+        switch (c) {
+        case 'w':
+            w = atoi(optarg);
+            break;
+        case 'h':
+            h = atoi(optarg);
+            break;
+        case '?':
+            fprintf(stderr, "bad option `-%c'\n", optopt);
+            return 1;
+        default:
+            fprintf(stderr, "something happened???");
+            return 1;
+        }
+    }
+
+    int nFuncs = argc - optind;
+    TransformFunc *funcs = malloc(nFuncs * sizeof(TransformFunc));
+    for (int i = optind; i < argc; ++i) {
+        switch (atoi(argv[i])) {
+        case 1:  funcs[i - optind] = v1; break;
+        case 2:  funcs[i - optind] = v2; break;
+        case 3:  funcs[i - optind] = v3; break;
+        case 4:  funcs[i - optind] = v4; break;
+        case 5:  funcs[i - optind] = v5; break;
+        case 6:  funcs[i - optind] = v6; break;
+        case 16: funcs[i - optind] = v16; break;
+        case 17: funcs[i - optind] = v17; break;
+        default:
+            fprintf(stderr, "unknown variation %s\n", argv[i]);
+            return 1;
+        }
+    }
+
     srand(time(NULL));
 
     for (int i = 0; i < (sizeof(affines) / sizeof(float[6])); ++i) {
         for (int j = 0; j < 6; ++j) affines[i][j] = (rand() / (float)RAND_MAX)*2 - 1;
     }
 
-    const int w = 1920, h = 1080;
     Color **hist = malloc(w * sizeof(Color*));
     for (int x = 0; x < w; ++x) {
         hist[x] = malloc(h * sizeof(Color));

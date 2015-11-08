@@ -6,10 +6,10 @@ HEADERS = $(wildcard src/*.h)
 all: bin/fractal
 
 bin/%.o: src/%.c $(HEADERS)
-	gcc -g -O0 -Wall -Wpedantic -Wextra -c $< -o $@ -std=c99
+	gcc -g -O0 -Wall -Wpedantic -Wextra -c $< -o $@
 
 bin/fractal: $(OBJECTS)
-	gcc -g -O0 -Wall -Wpedantic -Wextra $^ -o $@ -lm -std=c99
+	gcc -g -O0 -Wall -Wpedantic -Wextra $^ -o $@ -lm
 
 clean:
 	-rm -f bin/*
