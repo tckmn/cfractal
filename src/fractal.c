@@ -183,6 +183,27 @@ void v20(Point *p, float aff[6]) {
     p->y = -sin(M_PI * p->x) * sinh(p->y);
 }
 
+void v21(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y),
+          thingy = fmod((r + aff[2]*aff[2]), (2 * aff[2]*aff[2])) - aff[2]*aff[2] +
+              r * (1 - aff[2]*aff[2]);
+    p->x = thingy * cos(theta);
+    p->y = thingy * sin(theta);
+}
+
+void v22(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y),
+          t = M_PI * aff[2]*aff[2];
+    if (fmod(theta + aff[5], t) > t/2) {
+        p->x = r*cos(theta - t/2);
+        p->y = r*sin(theta - t/2);
+    } else {
+        p->x = r*cos(theta + t/2);
+        p->y = r*sin(theta + t/2);
+    }
+}
 void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
     Color **hist = malloc(w * sizeof(Color*));
     for (int x = 0; x < w; ++x) {
@@ -283,6 +304,8 @@ int main(int argc, char **argv) {
         case 18: funcs[i - optind] = v18; break;
         case 19: funcs[i - optind] = v19; break;
         case 20: funcs[i - optind] = v20; break;
+        case 21: funcs[i - optind] = v21; break;
+        case 22: funcs[i - optind] = v22; break;
         default:
             fprintf(stderr, "unknown variation %s\n", argv[i]);
             return 1;
