@@ -82,9 +82,10 @@ int main() {
         for (int j = 0; j < 6; ++j) affines[i][j] = (rand() / (float)RAND_MAX)*2 - 1;
     }
 
-    const int w = 600, h = 500;
-    Color hist[w][h];
+    const int w = 1920, h = 1080;
+    Color **hist = malloc(w * sizeof(Color*));
     for (int x = 0; x < w; ++x) {
+        hist[x] = malloc(h * sizeof(Color));
         for (int y = 0; y < h; ++y) {
             hist[x][y] = (Color) {0.0, 0.0, 0.0};
         }
@@ -93,7 +94,7 @@ int main() {
     float maxR = 0, maxG = 0, maxB = 0;
     Point p = {0.5, 0.5};
     float color = 0.5;
-    for (int i = 0; i < 10000000; ++i) {
+    for (long i = 0; i < (long)w * (long)h * 15L; ++i) {
         int affIdx = rand() % sizeof(affines) / sizeof(float[6]);
         affine(&p, affines[affIdx]);
         int idx = rand() % nFuncs;
