@@ -101,7 +101,7 @@ int main() {
         int x = (int)((p.x + 1) * (w / 2));
         int y = (int)((p.y + 1) * (h / 2));
         color = (color + ((float)idx / nFuncs)) / 2;
-        if (p.x > -1 && p.x < 1 && p.y > -1 && p.y < 1) {
+        if (x >= 0 && x < w && y >= 0 && y < h) {
             hist[x][y].r += hue2rgb(color).r;
             if (hist[x][y].r > maxR) maxR = hist[x][y].r;
             hist[x][y].g += hue2rgb(color).g;
@@ -117,7 +117,7 @@ int main() {
             //int val = (int)((1 / log(2)) * log((float)hist[x][y] / max + 1) * 255);
             //int val = (int)((float)hist[x][y] / max * 255) * 10;
             //if (val > 255) val = 255;
-            //NOTE: const power below (4) can be any even number
+            //NOTE: const power below (24) can be any even number
             const int p = 24;
             //int val = (int)(255 * (1 - pow((float)hist[x][y] / max - 1, 4)));
             printf("%d %d %d\n",
