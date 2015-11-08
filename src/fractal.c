@@ -74,6 +74,20 @@ void v6(Point *p, float aff[6]) {
     p->y = r * cos(theta - r);
 }
 
+void v7(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = r * sin(theta * r);
+    p->y = r * -cos(theta * r);
+}
+
+void v8(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = theta / M_PI * sin(M_PI * r);
+    p->y = theta / M_PI * cos(M_PI * r);
+}
+
 void v16(Point *p, float aff[6]) {
     float r = 2 / (sqrt(p->x*p->x + p->y*p->y) + 1);
     p->x = r*p->y;
@@ -116,6 +130,8 @@ int main(int argc, char **argv) {
         case 4:  funcs[i - optind] = v4; break;
         case 5:  funcs[i - optind] = v5; break;
         case 6:  funcs[i - optind] = v6; break;
+        case 7:  funcs[i - optind] = v7; break;
+        case 8:  funcs[i - optind] = v8; break;
         case 16: funcs[i - optind] = v16; break;
         case 17: funcs[i - optind] = v17; break;
         default:
