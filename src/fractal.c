@@ -109,6 +109,41 @@ void v11(Point *p, float aff[6]) {
     p->y = cos(theta) * sin(r);
 }
 
+void v12(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y),
+          p0 = sin(theta + r),
+          p1 = cos(theta - r);
+    p->x = r * (pow(p0, 3) + pow(p1, 3));
+    p->y = r * (pow(p0, 3) - pow(p1, 3));
+}
+
+void v13(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y),
+          omega = (rand() % 2 == 0) ? 0 : M_PI;
+    p->x = sqrt(r) * cos(theta / 2 + omega);
+    p->y = sqrt(r) * sin(theta / 2 + omega);
+}
+
+void v14(Point *p, float aff[6]) {
+    if (p->x >= 0 && p->y >= 0) {
+        // NOP
+    } else if (p->x < 0 && p->y >= 0) {
+        p->x = 2*p->x;
+    } else if (p->x >= 0 && p->y < 0) {
+        p->x = p->y/2;
+    } else {
+        p->x = 2*p->x;
+        p->x = p->y/2;
+    }
+}
+
+void v15(Point *p, float aff[6]) {
+    p->x = p->x + aff[1] * sin(p->y / (aff[2]*aff[2]));
+    p->y = p->y + aff[4] * sin(p->x / (aff[5]*aff[5]));
+}
+
 void v16(Point *p, float aff[6]) {
     float r = 2 / (sqrt(p->x*p->x + p->y*p->y) + 1);
     p->x = r*p->y;
@@ -118,6 +153,25 @@ void v16(Point *p, float aff[6]) {
 void v17(Point *p, float aff[6]) {
     p->x = p->x + aff[2]*sin(tan(3*p->y));
     p->y = p->y + aff[5]*sin(tan(3*p->x));
+}
+
+// NOTE: this one is bad
+void v18(Point *p, float aff[6]) {
+    p->x = exp(p->x - 1) * cos(M_PI * p->y);
+    p->y = exp(p->x - 1) * sin(M_PI * p->y);
+}
+
+void v19(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = pow(r, sin(theta)) * cos(theta);
+    p->y = pow(r, sin(theta)) * sin(theta);
+}
+
+// NOTE: this one is also bad
+void v20(Point *p, float aff[6]) {
+    p->x = cos(M_PI * p->x) * cosh(p->y);
+    p->y = -sin(M_PI * p->x) * sinh(p->y);
 }
 
 int main(int argc, char **argv) {
@@ -156,8 +210,15 @@ int main(int argc, char **argv) {
         case 9:  funcs[i - optind] = v9; break;
         case 10: funcs[i - optind] = v10; break;
         case 11: funcs[i - optind] = v11; break;
+        case 12: funcs[i - optind] = v12; break;
+        case 13: funcs[i - optind] = v13; break;
+        case 14: funcs[i - optind] = v14; break;
+        case 15: funcs[i - optind] = v15; break;
         case 16: funcs[i - optind] = v16; break;
         case 17: funcs[i - optind] = v17; break;
+        case 18: funcs[i - optind] = v18; break;
+        case 19: funcs[i - optind] = v19; break;
+        case 20: funcs[i - optind] = v20; break;
         default:
             fprintf(stderr, "unknown variation %s\n", argv[i]);
             return 1;
