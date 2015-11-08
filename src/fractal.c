@@ -24,7 +24,7 @@ Color hue2rgb(double hue) {
     }
 }
 
-typedef void (*TransformFunc)(Point *p);
+typedef void (*TransformFunc)(Point *p, double aff[6]);
 
 void affine(Point *p, double aff[6]) {
     p->x = aff[0]*p->x + aff[1]*p->y + aff[4];
@@ -38,30 +38,41 @@ double affines[][6] = {
     {0,0,0,0,0,0}
 };
 
-void v1(Point *p) {
+void v1(Point *p, double aff[6]) {
     p->x = sin(p->x);
     p->y = sin(p->y);
 }
 
-void v2(Point *p) {
+void v2(Point *p, double aff[6]) {
     double r = 1 / (p->x*p->x + p->y*p->y);
     p->x = r*p->x;
     p->y = r*p->y;
 }
 
-void v3(Point *p) {
+void v3(Point *p, double aff[6]) {
     double r = p->x*p->x + p->y*p->y;
     p->x = sin(r)*p->x - cos(r)*p->y;
     p->y = sin(r)*p->x + cos(r)*p->y;
 }
 
-void v16(Point *p) {
+void v4(Point *p, double aff[6]) {
+    double r = 1 / (p->x*p->x + p->y*p->y);
+    p->x = r*(p->x-p->y)*(p->x+p->y);
+    p->y = 2*p->x*p->y;
+}
+
+void v16(Point *p, double aff[6]) {
     double r = 2 / (p->x*p->x + p->y*p->y + 1);
     p->x = r*p->y;
     p->y = r*p->x;
 }
 
-TransformFunc funcs[] = {v1, v2, v3, v16};
+void v17(Point *p, double aff[6]) {
+    p->x = p->x + aff[2]*sin(tan(3*p->y));
+    p->y = p->y + aff[5]*sin(tan(3*p->x));
+}
+
+TransformFunc funcs[] = {v1, v2, v3, v16, v17, v4};
 int nFuncs = sizeof(funcs) / sizeof(TransformFunc);
 
 int main() {
@@ -83,9 +94,10 @@ int main() {
     Point p = {0.5, 0.5};
     double color = 0.5;
     for (int i = 0; i < 10000000; ++i) {
-        affine(&p, affines[rand() % sizeof(affines) / sizeof(double[6])]);
+        int affIdx = rand() % sizeof(affines) / sizeof(double[6]);
+        affine(&p, affines[affIdx]);
         int idx = rand() % nFuncs;
-        funcs[idx](&p);
+        funcs[idx](&p, affines[affIdx]);
         int x = (int)((p.x + 1) * (w / 2));
         int y = (int)((p.y + 1) * (h / 2));
         color = (color + ((double)idx / nFuncs)) / 2;
@@ -100,8 +112,8 @@ int main() {
     }
 
     printf("P3\n%d %d\n255\n", w, h);
-    for (int x = 0; x < w; ++x) {
-        for (int y = 0; y < h; ++y) {
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
             //int val = (int)((1 / log(2)) * log((double)hist[x][y] / max + 1) * 255);
             //int val = (int)((double)hist[x][y] / max * 255) * 10;
             //if (val > 255) val = 255;
