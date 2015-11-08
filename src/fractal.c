@@ -38,6 +38,12 @@ float affines[][6] = {
     {0,0,0,0,0,0},
     {0,0,0,0,0,0}
 };
+float affineDeltas[][6] = {
+    {0,0,0,0,0,0},
+    {0,0,0,0,0,0},
+    {0,0,0,0,0,0},
+    {0,0,0,0,0,0}
+};
 
 void v0(Point *p, float aff[6]) {
 }
@@ -286,35 +292,19 @@ int main(int argc, char **argv) {
     srand(time(NULL));
 
     for (int i = 0; i < (sizeof(affines) / sizeof(float[6])); ++i) {
-        for (int j = 0; j < 6; ++j) affines[i][j] = (rand() / (float)RAND_MAX)*2 - 1;
+        for (int j = 0; j < 6; ++j) {
+            affines[i][j] = (rand() / (float)RAND_MAX)*2 - 1;
+            affineDeltas[i][j] = (rand() / (float)RAND_MAX)*0.02 - 0.01;
+        }
     }
 
-    for (int i = 0; i < nFrames; ++i) {
-        render(w, h, nFuncs, funcs, i);
-        affines[0][0] += 0.01;
-        affines[0][1] -= 0.01;
-        affines[0][2] -= 0.01;
-        affines[0][3] += 0.01;
-        affines[0][4] += 0.01;
-        affines[0][5] -= 0.01;
-        affines[1][0] += 0.01;
-        affines[1][1] -= 0.01;
-        affines[1][2] -= 0.01;
-        affines[1][3] += 0.01;
-        affines[1][4] += 0.01;
-        affines[1][5] -= 0.01;
-        affines[2][0] += 0.01;
-        affines[2][1] -= 0.01;
-        affines[2][2] -= 0.01;
-        affines[2][3] += 0.01;
-        affines[2][4] += 0.01;
-        affines[2][5] -= 0.01;
-        affines[3][0] += 0.01;
-        affines[3][1] -= 0.01;
-        affines[3][2] -= 0.01;
-        affines[3][3] += 0.01;
-        affines[3][4] += 0.01;
-        affines[3][5] -= 0.01;
+    for (int frame = 0; frame < nFrames; ++frame) {
+        render(w, h, nFuncs, funcs, frame);
+        for (int i = 0; i < (sizeof(affines) / sizeof(float[6])); ++i) {
+            for (int j = 0; j < 6; ++j) {
+                affines[i][j] += affineDeltas[i][j];
+            }
+        }
     }
 
     if (nFrames > 1) {
