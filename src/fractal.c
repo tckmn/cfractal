@@ -177,64 +177,7 @@ void v20(Point *p, float aff[6]) {
     p->y = -sin(M_PI * p->x) * sinh(p->y);
 }
 
-int main(int argc, char **argv) {
-    int w = 1000, h = 1000;
-
-    int c;
-    while ((c = getopt(argc, argv, "w:h:")) != -1) {
-        switch (c) {
-        case 'w':
-            w = atoi(optarg);
-            break;
-        case 'h':
-            h = atoi(optarg);
-            break;
-        case '?':
-            fprintf(stderr, "bad option `-%c'\n", optopt);
-            return 1;
-        default:
-            fprintf(stderr, "something happened???");
-            return 1;
-        }
-    }
-
-    int nFuncs = argc - optind;
-    TransformFunc *funcs = malloc(nFuncs * sizeof(TransformFunc));
-    for (int i = optind; i < argc; ++i) {
-        switch (atoi(argv[i])) {
-        case 0:  funcs[i - optind] = v0; break;
-        case 1:  funcs[i - optind] = v1; break;
-        case 2:  funcs[i - optind] = v2; break;
-        case 3:  funcs[i - optind] = v3; break;
-        case 4:  funcs[i - optind] = v4; break;
-        case 5:  funcs[i - optind] = v5; break;
-        case 6:  funcs[i - optind] = v6; break;
-        case 7:  funcs[i - optind] = v7; break;
-        case 8:  funcs[i - optind] = v8; break;
-        case 9:  funcs[i - optind] = v9; break;
-        case 10: funcs[i - optind] = v10; break;
-        case 11: funcs[i - optind] = v11; break;
-        case 12: funcs[i - optind] = v12; break;
-        case 13: funcs[i - optind] = v13; break;
-        case 14: funcs[i - optind] = v14; break;
-        case 15: funcs[i - optind] = v15; break;
-        case 16: funcs[i - optind] = v16; break;
-        case 17: funcs[i - optind] = v17; break;
-        case 18: funcs[i - optind] = v18; break;
-        case 19: funcs[i - optind] = v19; break;
-        case 20: funcs[i - optind] = v20; break;
-        default:
-            fprintf(stderr, "unknown variation %s\n", argv[i]);
-            return 1;
-        }
-    }
-
-    srand(time(NULL));
-
-    for (int i = 0; i < (sizeof(affines) / sizeof(float[6])); ++i) {
-        for (int j = 0; j < 6; ++j) affines[i][j] = (rand() / (float)RAND_MAX)*2 - 1;
-    }
-
+void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
     Color **hist = malloc(w * sizeof(Color*));
     for (int x = 0; x < w; ++x) {
         hist[x] = malloc(h * sizeof(Color));
@@ -264,7 +207,10 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("P3\n%d %d\n255\n", w, h);
+    char buf[20];  // just to be safe. too tired to figure out the real value
+    sprintf(buf, "out%03d.ppm", num);
+    FILE *f = fopen(buf, "w");
+    fprintf(f, "P3\n%d %d\n255\n", w, h);
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
             //int val = (int)((1 / log(2)) * log((float)hist[x][y] / max + 1) * 255);
@@ -273,11 +219,108 @@ int main(int argc, char **argv) {
             //NOTE: const power below (24) can be any even number
             const int p = 10;
             //int val = (int)(255 * (1 - pow((float)hist[x][y] / max - 1, 4)));
-            printf("%d %d %d\n",
+            fprintf(f, "%d %d %d\n",
                     (int)(255 * (1 - pow(hist[x][y].r / maxR - 1, p))),
                     (int)(255 * (1 - pow(hist[x][y].g / maxG - 1, p))),
                     (int)(255 * (1 - pow(hist[x][y].b / maxB - 1, p))));
         }
+    }
+    fclose(f);
+}
+
+int main(int argc, char **argv) {
+    int w = 1000, h = 1000, nFrames = 1;
+
+    int c;
+    while ((c = getopt(argc, argv, "f:w:h:")) != -1) {
+        switch (c) {
+        case 'w':
+            w = atoi(optarg);
+            break;
+        case 'h':
+            h = atoi(optarg);
+            break;
+        case 'f':
+            nFrames = atoi(optarg);
+            break;
+        case '?':
+            fprintf(stderr, "bad option `-%c'\n", optopt);
+            return 1;
+        default:
+            fprintf(stderr, "something happened???");
+            return 1;
+        }
+    }
+
+    int nFuncs = argc - optind;
+    TransformFunc *funcs = malloc(nFuncs * sizeof(TransformFunc));
+    for (int i = optind; i < argc; ++i) {
+        switch (atoi(argv[i])) {
+        case 0:  funcs[i - optind] = v0;  break;
+        case 1:  funcs[i - optind] = v1;  break;
+        case 2:  funcs[i - optind] = v2;  break;
+        case 3:  funcs[i - optind] = v3;  break;
+        case 4:  funcs[i - optind] = v4;  break;
+        case 5:  funcs[i - optind] = v5;  break;
+        case 6:  funcs[i - optind] = v6;  break;
+        case 7:  funcs[i - optind] = v7;  break;
+        case 8:  funcs[i - optind] = v8;  break;
+        case 9:  funcs[i - optind] = v9;  break;
+        case 10: funcs[i - optind] = v10; break;
+        case 11: funcs[i - optind] = v11; break;
+        case 12: funcs[i - optind] = v12; break;
+        case 13: funcs[i - optind] = v13; break;
+        case 14: funcs[i - optind] = v14; break;
+        case 15: funcs[i - optind] = v15; break;
+        case 16: funcs[i - optind] = v16; break;
+        case 17: funcs[i - optind] = v17; break;
+        case 18: funcs[i - optind] = v18; break;
+        case 19: funcs[i - optind] = v19; break;
+        case 20: funcs[i - optind] = v20; break;
+        default:
+            fprintf(stderr, "unknown variation %s\n", argv[i]);
+            return 1;
+        }
+    }
+
+    srand(time(NULL));
+
+    for (int i = 0; i < (sizeof(affines) / sizeof(float[6])); ++i) {
+        for (int j = 0; j < 6; ++j) affines[i][j] = (rand() / (float)RAND_MAX)*2 - 1;
+    }
+
+    for (int i = 0; i < nFrames; ++i) {
+        render(w, h, nFuncs, funcs, i);
+        affines[0][0] += 0.01;
+        affines[0][1] -= 0.01;
+        affines[0][2] -= 0.01;
+        affines[0][3] += 0.01;
+        affines[0][4] += 0.01;
+        affines[0][5] -= 0.01;
+        affines[1][0] += 0.01;
+        affines[1][1] -= 0.01;
+        affines[1][2] -= 0.01;
+        affines[1][3] += 0.01;
+        affines[1][4] += 0.01;
+        affines[1][5] -= 0.01;
+        affines[2][0] += 0.01;
+        affines[2][1] -= 0.01;
+        affines[2][2] -= 0.01;
+        affines[2][3] += 0.01;
+        affines[2][4] += 0.01;
+        affines[2][5] -= 0.01;
+        affines[3][0] += 0.01;
+        affines[3][1] -= 0.01;
+        affines[3][2] -= 0.01;
+        affines[3][3] += 0.01;
+        affines[3][4] += 0.01;
+        affines[3][5] -= 0.01;
+    }
+
+    if (nFrames > 1) {
+        char buf[100];
+        sprintf(buf, "convert -delay 2 -size %dx%d -loop 0 out*.ppm out.gif", w, h);
+        system(buf);
     }
 
     return 0;
