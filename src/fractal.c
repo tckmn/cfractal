@@ -39,6 +39,9 @@ float affines[][6] = {
     {0,0,0,0,0,0}
 };
 
+void v0(Point *p, float aff[6]) {
+}
+
 void v1(Point *p, float aff[6]) {
     p->x = sin(p->x);
     p->y = sin(p->y);
@@ -199,6 +202,7 @@ int main(int argc, char **argv) {
     TransformFunc *funcs = malloc(nFuncs * sizeof(TransformFunc));
     for (int i = optind; i < argc; ++i) {
         switch (atoi(argv[i])) {
+        case 0:  funcs[i - optind] = v0; break;
         case 1:  funcs[i - optind] = v1; break;
         case 2:  funcs[i - optind] = v2; break;
         case 3:  funcs[i - optind] = v3; break;
@@ -267,7 +271,7 @@ int main(int argc, char **argv) {
             //int val = (int)((float)hist[x][y] / max * 255) * 10;
             //if (val > 255) val = 255;
             //NOTE: const power below (24) can be any even number
-            const int p = 24;
+            const int p = 10;
             //int val = (int)(255 * (1 - pow((float)hist[x][y] / max - 1, 4)));
             printf("%d %d %d\n",
                     (int)(255 * (1 - pow(hist[x][y].r / maxR - 1, p))),
