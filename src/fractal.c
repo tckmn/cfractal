@@ -88,6 +88,27 @@ void v8(Point *p, float aff[6]) {
     p->y = theta / M_PI * cos(M_PI * r);
 }
 
+void v9(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = (1 / r) * (cos(theta) + sin(r));
+    p->y = (1 / r) * (sin(theta) - cos(r));
+}
+
+void v10(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = sin(theta) / r;
+    p->y = r * cos(theta);
+}
+
+void v11(Point *p, float aff[6]) {
+    float r = sqrt(p->x*p->x + p->y*p->y),
+          theta = atan(p->x / p->y);
+    p->x = sin(theta) * cos(r);
+    p->y = cos(theta) * sin(r);
+}
+
 void v16(Point *p, float aff[6]) {
     float r = 2 / (sqrt(p->x*p->x + p->y*p->y) + 1);
     p->x = r*p->y;
@@ -132,6 +153,9 @@ int main(int argc, char **argv) {
         case 6:  funcs[i - optind] = v6; break;
         case 7:  funcs[i - optind] = v7; break;
         case 8:  funcs[i - optind] = v8; break;
+        case 9:  funcs[i - optind] = v9; break;
+        case 10: funcs[i - optind] = v10; break;
+        case 11: funcs[i - optind] = v11; break;
         case 16: funcs[i - optind] = v16; break;
         case 17: funcs[i - optind] = v17; break;
         default:
