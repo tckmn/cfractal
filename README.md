@@ -6,7 +6,7 @@ To compile:
 
 To run:
 
-    $ bin/cfractal 1 2 3 6 7 13 15 17 19
+    $ bin/fractal 1 2 3 6 7 13 15 17 19
 
 Substitute the list of numbers for which variations you want the fractal to
 include (requires at least two).
