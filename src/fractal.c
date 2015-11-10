@@ -216,7 +216,9 @@ void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
     float maxR = 0, maxG = 0, maxB = 0;
     Point p = {0.5, 0.5};
     float color = 0.5;
-    for (long i = 0; i < (long)w * (long)h * 15L; ++i) {
+    for (unsigned long long i = 0; i < ((unsigned long long)(w) *
+                (unsigned long long)(w) * (unsigned long long)(h) *
+                (unsigned long long)(h) / 10000ULL); ++i) {
         int affIdx = rand() % sizeof(affines) / sizeof(float[6]);
         affine(&p, affines[affIdx]);
         int idx = rand() % nFuncs;
@@ -244,7 +246,7 @@ void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
             //int val = (int)((float)hist[x][y] / max * 255) * 10;
             //if (val > 255) val = 255;
             //NOTE: const power below (24) can be any even number
-            const int p = 10;
+            const int p = 30;
             //int val = (int)(255 * (1 - pow((float)hist[x][y] / max - 1, 4)));
             fprintf(f, "%d %d %d\n",
                     (int)(255 * (1 - pow(hist[x][y].r / maxR - 1, p))),
