@@ -256,6 +256,8 @@ void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
         int y = (int)((p.y + 1) * (h / 2));
         color = (color + ((float)idx / nFuncs)) / 2;
         if (x >= 0 && x < w && y >= 0 && y < h) {
+            // do NOT try to "optimize" this by creating a 'rgb' local variable
+            // for some reason that makes it slower
             hist[x][y].r += hue2rgb(color).r;
             if (hist[x][y].r > maxR) maxR = hist[x][y].r;
             hist[x][y].g += hue2rgb(color).g;
