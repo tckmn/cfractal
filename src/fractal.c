@@ -210,6 +210,29 @@ void v22(Point *p, float aff[6]) {
         p->y = r*sin(theta + t/2);
     }
 }
+
+void output(Color **hist, int w, int h, int num, float maxR, float maxG, float maxB) {
+    char buf[20];  // just to be safe. too tired to figure out the real value
+    sprintf(buf, "out%03d.ppm", num);
+    FILE *f = fopen(buf, "w");
+    fprintf(f, "P3\n%d %d\n255\n", w, h);
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            //int val = (int)((1 / log(2)) * log((float)hist[x][y] / max + 1) * 255);
+            //int val = (int)((float)hist[x][y] / max * 255) * 10;
+            //if (val > 255) val = 255;
+            //NOTE: const power below (24) can be any even number
+            const int p = 30;
+            //int val = (int)(255 * (1 - pow((float)hist[x][y] / max - 1, 4)));
+            fprintf(f, "%d %d %d\n",
+                    (int)(255 * (1 - pow(hist[x][y].r / maxR - 1, p))),
+                    (int)(255 * (1 - pow(hist[x][y].g / maxG - 1, p))),
+                    (int)(255 * (1 - pow(hist[x][y].b / maxB - 1, p))));
+        }
+    }
+    fclose(f);
+}
+
 void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
     Color **hist = malloc(w * sizeof(Color*));
     for (int x = 0; x < w; ++x) {
@@ -242,25 +265,7 @@ void render(int w, int h, int nFuncs, TransformFunc *funcs, int num) {
         }
     }
 
-    char buf[20];  // just to be safe. too tired to figure out the real value
-    sprintf(buf, "out%03d.ppm", num);
-    FILE *f = fopen(buf, "w");
-    fprintf(f, "P3\n%d %d\n255\n", w, h);
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            //int val = (int)((1 / log(2)) * log((float)hist[x][y] / max + 1) * 255);
-            //int val = (int)((float)hist[x][y] / max * 255) * 10;
-            //if (val > 255) val = 255;
-            //NOTE: const power below (24) can be any even number
-            const int p = 30;
-            //int val = (int)(255 * (1 - pow((float)hist[x][y] / max - 1, 4)));
-            fprintf(f, "%d %d %d\n",
-                    (int)(255 * (1 - pow(hist[x][y].r / maxR - 1, p))),
-                    (int)(255 * (1 - pow(hist[x][y].g / maxG - 1, p))),
-                    (int)(255 * (1 - pow(hist[x][y].b / maxB - 1, p))));
-        }
-    }
-    fclose(f);
+    output(hist, w, h, num, maxR, maxG, maxB);
 }
 
 int main(int argc, char **argv) {
