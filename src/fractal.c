@@ -60,14 +60,16 @@ void v2(Point *p, float aff[6]) {
 }
 
 void v3(Point *p, float aff[6]) {
-    float r = p->x*p->x + p->y*p->y;
-    p->x = sin(r)*p->x - cos(r)*p->y;
-    p->y = sin(r)*p->x + cos(r)*p->y;
+    float r = p->x*p->x + p->y*p->y,
+          thingy = sin(r)*p->x,
+          thingy2 = cos(r)*p->y;
+    p->x = thingy - thingy2;
+    p->y = thingy + thingy2;
 }
 
 void v4(Point *p, float aff[6]) {
-    float r = 1 / sqrt(p->x*p->x + p->y*p->y);
-    p->x = r*(p->x-p->y)*(p->x+p->y);
+    float xsq = p->x * p->x, ysq = p->y * p->y;
+    p->x = (1 / sqrt(xsq + ysq)) * (xsq - ysq);
     p->y = 2*p->x*p->y;
 }
 
@@ -85,9 +87,9 @@ void v6(Point *p, float aff[6]) {
 
 void v7(Point *p, float aff[6]) {
     float r = sqrt(p->x*p->x + p->y*p->y),
-          theta = atan(p->x / p->y);
-    p->x = r * sin(theta * r);
-    p->y = r * -cos(theta * r);
+          rtheta = r * atan(p->x / p->y);
+    p->x = r * sin(rtheta);
+    p->y = r * -cos(rtheta);
 }
 
 void v8(Point *p, float aff[6]) {
@@ -123,16 +125,20 @@ void v12(Point *p, float aff[6]) {
           theta = atan(p->x / p->y),
           p0 = sin(theta + r),
           p1 = cos(theta - r);
-    p->x = r * (pow(p0, 3) + pow(p1, 3));
-    p->y = r * (pow(p0, 3) - pow(p1, 3));
+    // performance optimizations...
+    p0 = p0*p0*p0;
+    p1 = p1*p1*p1;
+    p->x = r * (p0 + p1);
+    p->y = r * (p0 - p1);
 }
 
 void v13(Point *p, float aff[6]) {
-    float r = sqrt(p->x*p->x + p->y*p->y),
+    float sqrtr = sqrt(sqrt(p->x*p->x + p->y*p->y)),
           theta = atan(p->x / p->y),
-          omega = (rand() % 2 == 0) ? 0 : M_PI;
-    p->x = sqrt(r) * cos(theta / 2 + omega);
-    p->y = sqrt(r) * sin(theta / 2 + omega);
+          omega = (rand() % 2 == 0) ? 0 : M_PI,
+          thingy = theta / 2 + omega;
+    p->x = sqrtr * cos(thingy);
+    p->y = sqrtr * sin(thingy);
 }
 
 void v14(Point *p, float aff[6]) {
